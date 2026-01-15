@@ -1,0 +1,69 @@
+# ============================================================================
+# AWS Configuration
+# ============================================================================
+aws_region  = "us-east-1"
+aws_profile = "your-aws-profile-name"
+
+# ============================================================================
+# Networking Configuration
+# ============================================================================
+vpc_id             = "vpc-xxxxxxxxxxxxxxxxx"
+public_subnet_ids  = ["subnet-xxxxxxxxxxxxxxxxx", "subnet-yyyyyyyyyyyyyyyyy"]
+private_subnet_ids = ["subnet-zzzzzzzzzzzzzzzzz", "subnet-aaaaaaaaaaaaaaaaa"]
+
+# Security Groups
+alb_security_group_id      = "sg-xxxxxxxxxxxxxxxxx"  # Allow 80, 443 from 0.0.0.0/0
+frontend_security_group_id = "sg-yyyyyyyyyyyyyyyyy"  # Allow 80 from ALB SG
+backend_security_group_id  = "sg-zzzzzzzzzzzzzzzzz"  # Allow 3000 from Frontend SG
+database_security_group_id = "sg-aaaaaaaaaaaaaaaaa"  # Allow 5432 from Backend SG
+
+# ============================================================================
+# Route53 Configuration
+# ============================================================================
+hosted_zone_id = "Z1234567890ABC"
+domain_name    = "bmi.example.com"
+
+# ============================================================================
+# EC2 Configuration
+# ============================================================================
+key_name = "your-ec2-key-pair-name"
+
+# Instance Types (adjust based on workload)
+instance_type_frontend = "t3.small"   # 2 vCPU, 2 GB RAM
+instance_type_backend  = "t3.small"   # 2 vCPU, 2 GB RAM
+instance_type_database = "t3.medium"  # 2 vCPU, 4 GB RAM
+
+# Optional: Specify AMI ID (leave empty to use latest Ubuntu 22.04 LTS)
+# ami_id = "ami-0c55b159cbfafe1f0"
+
+# ============================================================================
+# Application Configuration
+# ============================================================================
+git_repo_url = "https://github.com/your-username/bmi-health-tracker.git"
+git_branch   = "main"
+
+# ============================================================================
+# Database Configuration
+# ============================================================================
+db_name     = "bmidb"
+db_user     = "bmi_user"
+db_password = "your-secure-database-password-here"  # CHANGE THIS!
+db_port     = 5432
+
+# ============================================================================
+# Backend Configuration
+# ============================================================================
+backend_port = 3000
+
+# ============================================================================
+# Project Tags
+# ============================================================================
+project_name = "bmi-health-tracker"
+environment  = "production"
+
+common_tags = {
+  Owner       = "Your Name"
+  Team        = "DevOps"
+  CostCenter  = "Engineering"
+  Terraform   = "true"
+}

@@ -1,0 +1,24 @@
+# ============================================================================
+# S3 Backend Configuration for Terraform State
+# ============================================================================
+# 
+# This file contains configuration for storing Terraform state in S3.
+# 
+# Usage:
+#   terraform init -backend-config=backend-config.tfbackend
+# 
+# IMPORTANT: Add this file to .gitignore - it may contain sensitive info!
+# ============================================================================
+
+bucket         = "your-terraform-state-bucket-name"
+key            = "bmi-health-tracker/terraform.tfstate"
+region         = "us-east-1"
+encrypt        = true
+profile        = "your-aws-profile-name"
+
+# Optional: DynamoDB table for state locking
+# Prevents concurrent terraform operations
+# dynamodb_table = "terraform-state-lock"
+
+# Optional: Additional security
+# kms_key_id = "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"

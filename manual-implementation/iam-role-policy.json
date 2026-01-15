@@ -1,0 +1,35 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Route53DNSChallenge",
+      "Effect": "Allow",
+      "Action": [
+        "route53:GetChange",
+        "route53:ListHostedZones",
+        "route53:ListHostedZonesByName",
+        "route53:ListResourceRecordSets"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "Route53RecordManagement",
+      "Effect": "Allow",
+      "Action": [
+        "route53:ChangeResourceRecordSets"
+      ],
+      "Resource": "arn:aws:route53:::hostedzone/*"
+    },
+    {
+      "Sid": "ACMCertificateImport",
+      "Effect": "Allow",
+      "Action": [
+        "acm:ImportCertificate",
+        "acm:ListCertificates",
+        "acm:DescribeCertificate",
+        "acm:AddTagsToCertificate"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
