@@ -691,7 +691,7 @@ sudo ./deploy-database.sh
 
 **What the script does:**
 1. ✅ Updates Ubuntu packages
-2. ✅ Installs PostgreSQL 15
+2. ✅ Installs PostgreSQL (version 16 on Ubuntu 24.04, or default version)
 3. ✅ Creates database `bmi_db`
 4. ✅ Creates user `bmi_user` with password
 5. ✅ Configures PostgreSQL to accept network connections
@@ -784,7 +784,7 @@ sudo ./deploy-backend.sh
 
 **What the script does:**
 1. ✅ Updates Ubuntu packages
-2. ✅ Installs Node.js 18 LTS
+2. ✅ Installs Node.js 20 LTS
 3. ✅ Installs PM2 process manager
 4. ✅ Clones application code to `/home/ubuntu/app`
 5. ✅ Creates `.env` file with database connection
@@ -884,7 +884,7 @@ sudo ./deploy-frontend.sh
 **What the script does:**
 1. ✅ Updates Ubuntu packages
 2. ✅ Installs Nginx web server
-3. ✅ Installs Node.js 18 (for building React app)
+3. ✅ Installs Node.js 20 (for building React app)
 4. ✅ Clones application code
 5. ✅ Builds React production bundle (`npm run build`)
 6. ✅ Copies build files to `/var/www/bmi.ostaddevops.click`
@@ -1119,7 +1119,7 @@ sudo ./deploy-backend.sh
 ```
 
 Script will:
-- ✅ Install Node.js 18 and PM2
+- ✅ Install Node.js 20 and PM2
 - ✅ Clone application code
 - ✅ Configure environment variables
 - ✅ Start backend API
@@ -1653,7 +1653,7 @@ Your application is now live at: **https://bmi.ostaddevops.click**
    └─ 1 IAM Role (for certificate management)
 
 ✅ Application Servers:
-   ├─ Database: PostgreSQL 15 on port 5432
+   ├─ Database: PostgreSQL (v16) on port 5432
    ├─ Backend: Node.js/PM2 API on port 3000
    └─ Frontend: Nginx web server on port 80
 

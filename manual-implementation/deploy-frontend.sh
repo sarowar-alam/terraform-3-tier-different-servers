@@ -19,6 +19,20 @@ echo -e "${GREEN}=================================="
 echo "BMI Health Tracker - Frontend Setup"
 echo "==================================${NC}"
 
+# Detect actual user (not root)
+if [ "$SUDO_USER" ]; then
+    ACTUAL_USER="$SUDO_USER"
+    ACTUAL_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+elif [ "$USER" != "root" ]; then
+    ACTUAL_USER="$USER"
+    ACTUAL_HOME="$HOME"
+else
+    ACTUAL_USER="ubuntu"
+    ACTUAL_HOME="/home/ubuntu"
+fi
+
+echo -e "${YELLOW}Running as: $(whoami), App user: $ACTUAL_USER${NC}"
+
 # Configuration
 BACKEND_HOST="${BACKEND_HOST:-localhost}"
 BACKEND_PORT="${BACKEND_PORT:-3000}"
@@ -50,7 +64,7 @@ apt-get install -y git curl build-essential nginx
 
 # Install Node.js (for building)
 echo -e "${GREEN}[3/5] Installing Node.js...${NC}"
-curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt-get install -y nodejs
 
 node --version
@@ -58,16 +72,33 @@ npm --version
 
 # Setup application
 echo -e "${GREEN}[4/5] Setting up application...${NC}"
-APP_DIR="/home/ubuntu/app"
-mkdir -p $APP_DIR
-cd $APP_DIR
+APP_DIR="$ACTUAL_HOME/app"
 
-# Clone repository
-echo "Cloning repository..."
-git clone -b $GIT_BRANCH $GIT_REPO .
+# Check if directory exists and handle accordingly
+if [ -d "$APP_DIR" ]; then
+    echo "App directory exists, checking for git repository..."
+    if [ -d "$APP_DIR/.git" ]; then
+        echo "Git repository found, pulling latest changes..."
+        cd $APP_DIR
+        git fetch origin
+        git reset --hard origin/$GIT_BRANCH
+        git pull origin $GIT_BRANCH
+    else
+        echo "Not a git repository, removing and cloning fresh..."
+        rm -rf $APP_DIR
+        mkdir -p $APP_DIR
+        cd $APP_DIR
+        git clone -b $GIT_BRANCH $GIT_REPO .
+    fi
+else
+    echo "Creating new app directory..."
+    mkdir -p $APP_DIR
+    cd $APP_DIR
+    git clone -b $GIT_BRANCH $GIT_REPO .
+fi
 
 # Build frontend
-cd frontend
+cd $APP_DIR/frontend
 echo "Installing dependencies..."
 npm install
 
@@ -137,7 +168,7 @@ sleep 3
 curl -f http://localhost/ > /dev/null && echo "✅ Frontend accessible" || echo "⚠️ Warning: Frontend check failed"
 
 # Change ownership
-chown -R ubuntu:ubuntu $APP_DIR
+chown -R $ACTUAL_USER:$ACTUAL_USER $APP_DIR
 
 # Show info
 PRIVATE_IP=$(hostname -I | awk '{print $1}')

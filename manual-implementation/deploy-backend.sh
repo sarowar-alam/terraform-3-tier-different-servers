@@ -19,12 +19,26 @@ echo -e "${GREEN}=================================="
 echo "BMI Health Tracker - Backend Setup"
 echo "==================================${NC}"
 
+# Detect actual user (not root)
+if [ "$SUDO_USER" ]; then
+    ACTUAL_USER="$SUDO_USER"
+    ACTUAL_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+elif [ "$USER" != "root" ]; then
+    ACTUAL_USER="$USER"
+    ACTUAL_HOME="$HOME"
+else
+    ACTUAL_USER="ubuntu"
+    ACTUAL_HOME="/home/ubuntu"
+fi
+
+echo -e "${YELLOW}Running as: $(whoami), App user: $ACTUAL_USER${NC}"
+
 # Configuration
 DB_HOST="${DB_HOST:-localhost}"
 DB_PORT="${DB_PORT:-5432}"
 DB_NAME="${DB_NAME:-bmi_db}"
 DB_USER="${DB_USER:-bmi_user}"
-DB_PASSWORD="${DB_PASSWORD:-ChangeMe123!}"
+DB_PASSWORD="${DB_PASSWORD:-0stad2025}"
 BACKEND_PORT="${BACKEND_PORT:-3000}"
 FRONTEND_URL="${FRONTEND_URL:-https://bmi.ostaddevops.click}"
 GIT_REPO="${GIT_REPO:-https://github.com/sarowar-alam/terraform-3-tier-different-servers.git}"
@@ -53,9 +67,9 @@ DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 echo -e "${GREEN}[2/6] Installing build tools...${NC}"
 apt-get install -y git curl build-essential
 
-# Install Node.js 18.x LTS
-echo -e "${GREEN}[3/6] Installing Node.js 18.x LTS...${NC}"
-curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+# Install Node.js 20.x LTS
+echo -e "${GREEN}[3/6] Installing Node.js 20.x LTS...${NC}"
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt-get install -y nodejs
 
 # Verify installation
@@ -68,16 +82,33 @@ npm install -g pm2
 
 # Setup application directory
 echo -e "${GREEN}[5/6] Setting up application...${NC}"
-APP_DIR="/home/ubuntu/app"
-mkdir -p $APP_DIR
-cd $APP_DIR
+APP_DIR="$ACTUAL_HOME/app"
 
-# Clone repository
-echo "Cloning repository..."
-git clone -b $GIT_BRANCH $GIT_REPO .
+# Check if directory exists and handle accordingly
+if [ -d "$APP_DIR" ]; then
+    echo "App directory exists, checking for git repository..."
+    if [ -d "$APP_DIR/.git" ]; then
+        echo "Git repository found, pulling latest changes..."
+        cd $APP_DIR
+        git fetch origin
+        git reset --hard origin/$GIT_BRANCH
+        git pull origin $GIT_BRANCH
+    else
+        echo "Not a git repository, removing and cloning fresh..."
+        rm -rf $APP_DIR
+        mkdir -p $APP_DIR
+        cd $APP_DIR
+        git clone -b $GIT_BRANCH $GIT_REPO .
+    fi
+else
+    echo "Creating new app directory..."
+    mkdir -p $APP_DIR
+    cd $APP_DIR
+    git clone -b $GIT_BRANCH $GIT_REPO .
+fi
 
 # Navigate to backend
-cd backend
+cd $APP_DIR/backend
 
 # Create .env file
 echo "Creating environment configuration..."
@@ -127,21 +158,28 @@ pool.query('SELECT NOW()', (err, res) => {
 
 # Start with PM2
 echo -e "${GREEN}[6/6] Starting backend with PM2...${NC}"
-pm2 delete bmi-backend 2>/dev/null || true
-pm2 start src/server.js --name bmi-backend --time
-pm2 save
-pm2 startup systemd -u ubuntu --hp /home/ubuntu
 
-# Setup PM2 startup
-env PATH=$PATH:/usr/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
+# Delete old PM2 process if exists
+su - $ACTUAL_USER -c "pm2 delete bmi-backend" 2>/dev/null || true
 
-# Change ownership
-chown -R ubuntu:ubuntu $APP_DIR
-chown -R ubuntu:ubuntu /home/ubuntu/.pm2
+# Start application as the actual user
+su - $ACTUAL_USER -c "cd $APP_DIR/backend && pm2 start src/server.js --name bmi-backend --time"
+su - $ACTUAL_USER -c "pm2 save"
+
+# Setup PM2 startup (run as root)
+env PATH=$PATH:/usr/bin pm2 startup systemd -u $ACTUAL_USER --hp $ACTUAL_HOME
+
+# Change ownership to actual user
+chown -R $ACTUAL_USER:$ACTUAL_USER $APP_DIR
+
+# Verify PM2 directory exists and has correct permissions
+if [ -d "$ACTUAL_HOME/.pm2" ]; then
+    chown -R $ACTUAL_USER:$ACTUAL_USER $ACTUAL_HOME/.pm2
+fi
 
 # Wait and verify
 sleep 5
-pm2 list
+su - $ACTUAL_USER -c "pm2 list"
 
 # Test health endpoint
 echo "Testing backend health endpoint..."
