@@ -1012,7 +1012,38 @@ sudo ls -la /etc/letsencrypt/live/$DOMAIN/
 # privkey.pem    → Private key
 ```
 
-### 8.5 Import Certificate to AWS Certificate Manager (ACM)
+### 8.5 Install AWS CLI (If Not Already Installed)
+
+The frontend instance needs AWS CLI to import certificates to ACM. The IAM role (`bmi-certbot-role`) attached to the instance provides the necessary permissions.
+
+```bash
+# Check if AWS CLI is already installed
+aws --version
+
+# If not installed or version is old, install/update AWS CLI v2
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+sudo apt install -y unzip
+unzip awscliv2.zip
+sudo ./aws/install
+
+# Verify installation
+aws --version
+# Expected: aws-cli/2.x.x Python/3.x.x Linux/x.x.x
+
+# Verify IAM role permissions (should show account info)
+aws sts get-caller-identity
+
+# Expected output:
+# {
+#     "UserId": "AROAXXXXXXXXX:i-0eb6076c9707d23c4",
+#     "Account": "388779989543",
+#     "Arn": "arn:aws:sts::388779989543:assumed-role/bmi-certbot-role/i-0eb6076c9707d23c4"
+# }
+```
+
+**If AWS CLI was already installed and shows your IAM role, you're ready to proceed!**
+
+### 8.6 Import Certificate to AWS Certificate Manager (ACM)
 
 ```bash
 # Import certificate to ACM
@@ -1034,7 +1065,7 @@ echo "Certificate ARN: $CERT_ARN"
 Certificate ARN: arn:aws:acm:ap-south-1:388779989543:certificate/12345678-1234-1234-1234-123456789abc
 ```
 
-### 8.6 Save Certificate ARN
+### 8.7 Save Certificate ARN
 
 ```bash
 # Save ARN to file for reference
@@ -1043,7 +1074,7 @@ echo $CERT_ARN | sudo tee /tmp/certificate-arn.txt
 # Copy this ARN - you'll need it when creating ALB!
 ```
 
-### 8.7 Verify Certificate in AWS Console
+### 8.8 Verify Certificate in AWS Console
 
 1. Go to **AWS Console** → **Certificate Manager** (ACM)
 2. Region: **ap-south-1** (top right - verify correct region!)
@@ -1054,7 +1085,7 @@ echo $CERT_ARN | sudo tee /tmp/certificate-arn.txt
    In use: No (will change after ALB setup)
    ```
 
-### 8.8 Setup Auto-Renewal (Certificate expires in 90 days)
+### 8.9 Setup Auto-Renewal (Certificate expires in 90 days)
 
 ```bash
 # Create renewal script
