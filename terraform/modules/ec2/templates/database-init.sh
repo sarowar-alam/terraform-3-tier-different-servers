@@ -41,8 +41,10 @@ apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 
 # Install required packages
-echo "Installing required packages..."
+echo "Installing PostgreSQL (default version)..."
 apt-get install -y postgresql postgresql-contrib git curl
+
+# Note: Installs PostgreSQL 16 on Ubuntu 24.04, PostgreSQL 15 on Ubuntu 22.04
 
 # Configure PostgreSQL
 echo "Configuring PostgreSQL..."

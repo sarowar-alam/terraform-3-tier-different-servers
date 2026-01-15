@@ -471,3 +471,13 @@ aws ec2 describe-key-pairs --profile your-profile
 ## Questions?
 
 See [README.md](README.md) for detailed documentation or [QUICK_START.md](QUICK_START.md) for quick deployment guide.
+
+---
+
+## 🧑‍💻 Author
+
+**Md. Sarowar Alam**  
+Lead DevOps Engineer, Hogarth Worldwide
+
+📧 Email: sarowar@hotmail.com  
+🔗 LinkedIn: [linkedin.com/in/sarowar](https://linkedin.com/in/sarowar)

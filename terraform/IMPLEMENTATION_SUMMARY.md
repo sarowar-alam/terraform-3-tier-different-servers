@@ -439,3 +439,13 @@ You now have a complete, production-ready Terraform infrastructure for deploying
 **Terraform Version:** >= 1.0  
 **AWS Provider:** ~> 5.0  
 **Status:** ✅ Ready for Production
+
+---
+
+## 🧑‍💻 Author
+
+**Md. Sarowar Alam**  
+Lead DevOps Engineer, Hogarth Worldwide
+
+📧 Email: sarowar@hotmail.com  
+🔗 LinkedIn: [linkedin.com/in/sarowar](https://linkedin.com/in/sarowar)

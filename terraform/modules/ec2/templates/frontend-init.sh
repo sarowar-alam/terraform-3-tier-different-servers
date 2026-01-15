@@ -48,9 +48,9 @@ apt-get install -y git curl build-essential nginx
 echo "Installing Certbot with Route53 plugin..."
 apt-get install -y certbot python3-certbot-dns-route53 python3-certbot-nginx awscli
 
-# Install Node.js 18.x LTS (needed for building)
-echo "Installing Node.js..."
-curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+# Install Node.js 20.x LTS (needed for building)
+echo "Installing Node.js 20.x LTS..."
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt-get install -y nodejs
 
 # Verify installations

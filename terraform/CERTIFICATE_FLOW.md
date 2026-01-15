@@ -301,3 +301,13 @@ curl -I http://localhost/
 - ALB can optionally use imported certificate
 
 **Application works on HTTP immediately, HTTPS can be enabled after Certbot completes (optional).**
+
+---
+
+## 🧑‍💻 Author
+
+**Md. Sarowar Alam**  
+Lead DevOps Engineer, Hogarth Worldwide
+
+📧 Email: sarowar@hotmail.com  
+🔗 LinkedIn: [linkedin.com/in/sarowar](https://linkedin.com/in/sarowar)

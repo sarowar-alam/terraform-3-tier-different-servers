@@ -303,3 +303,13 @@ aws acm import-certificate \
 - ✅ HTTP redirects to HTTPS
 - ✅ Application accessible at `https://bmi.ostaddevops.click`
 - ✅ Certificate auto-renews every 60 days
+
+---
+
+## 🧑‍💻 Author
+
+**Md. Sarowar Alam**  
+Lead DevOps Engineer, Hogarth Worldwide
+
+📧 Email: sarowar@hotmail.com  
+🔗 LinkedIn: [linkedin.com/in/sarowar](https://linkedin.com/in/sarowar)

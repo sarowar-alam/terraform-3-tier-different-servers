@@ -170,3 +170,13 @@ See [README.md](README.md) for complete step-by-step instructions with screensho
 ## 🔗 Repository
 
 https://github.com/sarowar-alam/terraform-3-tier-different-servers
+
+---
+
+## 🧑‍💻 Author
+
+**Md. Sarowar Alam**  
+Lead DevOps Engineer, Hogarth Worldwide
+
+📧 Email: sarowar@hotmail.com  
+🔗 LinkedIn: [linkedin.com/in/sarowar](https://linkedin.com/in/sarowar)

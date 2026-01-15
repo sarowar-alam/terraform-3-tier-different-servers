@@ -250,3 +250,13 @@ aws logs tail /aws/ec2/bmi-health-tracker \
 ---
 
 **Ready to deploy?** Start with Step 1! 🚀
+
+---
+
+## 🧑‍💻 Author
+
+**Md. Sarowar Alam**  
+Lead DevOps Engineer, Hogarth Worldwide
+
+📧 Email: sarowar@hotmail.com  
+🔗 LinkedIn: [linkedin.com/in/sarowar](https://linkedin.com/in/sarowar)

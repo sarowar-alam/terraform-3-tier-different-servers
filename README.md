@@ -360,3 +360,13 @@ For issues or questions:
 **Terraform Version**: >= 1.0
 
 **AWS Provider**: ~> 5.0
+
+---
+
+## 🧑‍💻 Author
+
+**Md. Sarowar Alam**  
+Lead DevOps Engineer, Hogarth Worldwide
+
+📧 Email: sarowar@hotmail.com  
+🔗 LinkedIn: [linkedin.com/in/sarowar](https://linkedin.com/in/sarowar)

@@ -398,6 +398,16 @@ Approximate monthly costs (us-east-1):
 4. **Access Control**
    - Use bastion host or SSM Session Manager
    - Enable MFA for AWS accounts
+
+---
+
+## 🧑‍💻 Author
+
+**Md. Sarowar Alam**  
+Lead DevOps Engineer, Hogarth Worldwide
+
+📧 Email: sarowar@hotmail.com  
+🔗 LinkedIn: [linkedin.com/in/sarowar](https://linkedin.com/in/sarowar)
    - Audit access logs regularly
 
 5. **Monitoring**

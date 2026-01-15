@@ -348,3 +348,13 @@ If all else fails:
 3. Re-run script: `sudo bash /usr/local/bin/init-<server>.sh`
 4. Review this guide
 5. Check AWS Console > EC2 > Instance > System Log
+
+---
+
+## 🧑‍💻 Author
+
+**Md. Sarowar Alam**  
+Lead DevOps Engineer, Hogarth Worldwide
+
+📧 Email: sarowar@hotmail.com  
+🔗 LinkedIn: [linkedin.com/in/sarowar](https://linkedin.com/in/sarowar)

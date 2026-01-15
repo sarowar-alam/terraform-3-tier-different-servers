@@ -44,9 +44,9 @@ DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 echo "Installing required packages..."
 apt-get install -y git curl build-essential
 
-# Install Node.js 18.x LTS
-echo "Installing Node.js..."
-curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+# Install Node.js 20.x LTS
+echo "Installing Node.js 20.x LTS..."
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt-get install -y nodejs
 
 # Verify installations

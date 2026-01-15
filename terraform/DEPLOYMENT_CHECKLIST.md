@@ -391,3 +391,13 @@ Deployment is successful when:
 ---
 
 **Congratulations! Your BMI Health Tracker is now live! 🎉**
+
+---
+
+## 🧑‍💻 Author
+
+**Md. Sarowar Alam**  
+Lead DevOps Engineer, Hogarth Worldwide
+
+📧 Email: sarowar@hotmail.com  
+🔗 LinkedIn: [linkedin.com/in/sarowar](https://linkedin.com/in/sarowar)
