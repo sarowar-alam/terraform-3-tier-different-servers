@@ -2,9 +2,9 @@
 ################################################################################
 # Database Server Setup Script
 # 
-# This script installs and configures PostgreSQL 14 for the BMI Health Tracker
+# This script installs and configures PostgreSQL 15 for the BMI Health Tracker
 # 
-# Usage: sudo ./01-database-setup.sh
+# Usage: sudo ./deploy-database.sh
 ################################################################################
 
 set -e
@@ -20,11 +20,11 @@ echo "BMI Health Tracker - Database Setup"
 echo "==================================${NC}"
 
 # Configuration (modify these values)
-DB_NAME="${DB_NAME:-bmidb}"
+DB_NAME="${DB_NAME:-bmi_db}"
 DB_USER="${DB_USER:-bmi_user}"
 DB_PASSWORD="${DB_PASSWORD:-ChangeMe123!}"
 DB_PORT="${DB_PORT:-5432}"
-GIT_REPO="${GIT_REPO:-https://github.com/your-username/bmi-health-tracker.git}"
+GIT_REPO="${GIT_REPO:-https://github.com/sarowar-alam/terraform-3-tier-different-servers.git}"
 GIT_BRANCH="${GIT_BRANCH:-main}"
 
 # Check if running as root
@@ -45,8 +45,8 @@ apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 
 # Install PostgreSQL
-echo -e "${GREEN}[2/7] Installing PostgreSQL 14...${NC}"
-apt-get install -y postgresql postgresql-contrib git curl
+echo -e "${GREEN}[2/7] Installing PostgreSQL 15...${NC}"
+apt-get install -y postgresql-15 postgresql-contrib-15 git curl
 
 # Get PostgreSQL version
 PG_VERSION=$(psql --version | awk '{print $3}' | cut -d. -f1)

@@ -4,7 +4,7 @@
 # 
 # This script installs Node.js, clones the repository, and starts the backend
 # 
-# Usage: sudo DB_HOST=<db-ip> DB_PASSWORD=<password> ./02-backend-setup.sh
+# Usage: sudo ./deploy-backend.sh
 ################################################################################
 
 set -e
@@ -22,18 +22,19 @@ echo "==================================${NC}"
 # Configuration
 DB_HOST="${DB_HOST:-localhost}"
 DB_PORT="${DB_PORT:-5432}"
-DB_NAME="${DB_NAME:-bmidb}"
+DB_NAME="${DB_NAME:-bmi_db}"
 DB_USER="${DB_USER:-bmi_user}"
 DB_PASSWORD="${DB_PASSWORD:-ChangeMe123!}"
 BACKEND_PORT="${BACKEND_PORT:-3000}"
 FRONTEND_URL="${FRONTEND_URL:-https://bmi.ostaddevops.click}"
-GIT_REPO="${GIT_REPO:-https://github.com/your-username/bmi-health-tracker.git}"
+GIT_REPO="${GIT_REPO:-https://github.com/sarowar-alam/terraform-3-tier-different-servers.git}"
 GIT_BRANCH="${GIT_BRANCH:-main}"
 
 # Validate required variables
 if [ "$DB_HOST" == "localhost" ]; then
     echo -e "${RED}ERROR: DB_HOST not set!${NC}"
-    echo "Usage: sudo DB_HOST=<database-ip> DB_PASSWORD=<password> ./02-backend-setup.sh"
+    echo "Please edit this script and set DB_HOST to your database server IP"
+    echo "Example: DB_HOST=\"10.0.1.10\""
     exit 1
 fi
 
@@ -67,7 +68,7 @@ npm install -g pm2
 
 # Setup application directory
 echo -e "${GREEN}[5/6] Setting up application...${NC}"
-APP_DIR="/home/ubuntu/bmi-health-tracker"
+APP_DIR="/home/ubuntu/app"
 mkdir -p $APP_DIR
 cd $APP_DIR
 
