@@ -12,7 +12,8 @@ output "record_fqdn" {
   value       = aws_route53_record.main.fqdn
 }
 
-output "validation_record_fqdns" {
-  description = "FQDNs of certificate validation records"
-  value       = [for record in aws_route53_record.cert_validation : record.fqdn]
-}
+# Certificate validation handled by Certbot (no validation records needed)
+# output "validation_record_fqdns" {
+#   description = "FQDNs of certificate validation records"
+#   value       = [for record in aws_route53_record.cert_validation : record.fqdn]
+# }

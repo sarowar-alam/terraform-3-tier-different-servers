@@ -18,6 +18,9 @@ resource "aws_instance" "database" {
     git_branch  = var.git_branch
   })
 
+  # Force instance replacement when user_data changes
+  user_data_replace_on_change = true
+
   root_block_device {
     volume_type           = "gp3"
     volume_size           = 30
@@ -60,6 +63,9 @@ resource "aws_instance" "backend" {
     git_repo     = var.git_repo_url
     git_branch   = var.git_branch
   })
+
+  # Force instance replacement when user_data changes
+  user_data_replace_on_change = true
 
   root_block_device {
     volume_type           = "gp3"
@@ -104,6 +110,9 @@ resource "aws_instance" "frontend" {
     aws_region   = var.aws_region
   })
 
+  # Force instance replacement when user_data changes
+  user_data_replace_on_change = true
+
   root_block_device {
     volume_type           = "gp3"
     volume_size           = 20
@@ -129,11 +138,5 @@ resource "aws_instance" "frontend" {
 # ============================================================================
 # Attach Frontend Instance to Target Group
 # ============================================================================
-
-resource "aws_lb_target_group_attachment" "frontend" {
-  target_group_arn = var.frontend_target_group_arn
-  target_id        = aws_instance.frontend.id
-  port             = 80
-
-  depends_on = [aws_instance.frontend]
-}
+# MOVED TO ROOT MODULE to avoid circular dependency
+# The attachment is created in main.tf after both ALB and EC2 modules complete

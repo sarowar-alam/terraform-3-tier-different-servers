@@ -22,10 +22,11 @@ variable "alb_zone_id" {
   type        = string
 }
 
-variable "certificate_validation_options" {
-  description = "Certificate validation options from ACM"
-  type        = any
-}
+# Certificate validation is handled by Certbot (no longer needed)
+# variable "certificate_validation_options" {
+#   description = "Certificate validation options from ACM"
+#   type        = any
+# }
 
 variable "project_name" {
   description = "Project name for resource naming"

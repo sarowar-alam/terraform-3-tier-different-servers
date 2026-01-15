@@ -9,8 +9,8 @@ resource "aws_lb" "main" {
   security_groups    = [var.alb_security_group_id]
   subnets            = var.public_subnet_ids
 
-  enable_deletion_protection = false
-  enable_http2              = true
+  enable_deletion_protection       = false
+  enable_http2                     = true
   enable_cross_zone_load_balancing = true
 
   tags = merge(
@@ -61,25 +61,11 @@ resource "aws_lb_target_group" "frontend" {
 # ============================================================================
 # ACM Certificate for HTTPS
 # ============================================================================
-
-resource "aws_acm_certificate" "main" {
-  domain_name       = var.domain_name
-  validation_method = "DNS"
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  tags = merge(
-    var.common_tags,
-    {
-      Name = "${var.project_name}-certificate"
-    }
-  )
-}
+# Certificate is created by Certbot on frontend instance and imported to ACM
+# The certificate ARN is passed from the EC2 module after import completes
 
 # ============================================================================
-# ALB Listener - HTTP (Redirect to HTTPS)
+# ALB Listener - HTTP
 # ============================================================================
 
 resource "aws_lb_listener" "http" {
@@ -101,18 +87,23 @@ resource "aws_lb_listener" "http" {
 # ============================================================================
 # ALB Listener - HTTPS
 # ============================================================================
+# This listener will be created after Certbot imports the certificate
+# Terraform waits for the certificate via null_resource in EC2 module
 
 resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.main.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  certificate_arn   = aws_acm_certificate.main.arn
+  certificate_arn   = var.certificate_arn
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.frontend.arn
   }
 
-  depends_on = [aws_acm_certificate.main]
+  # Wait for certificate to be imported
+  lifecycle {
+    create_before_destroy = false
+  }
 }

@@ -93,10 +93,11 @@ variable "backend_port" {
   type        = number
 }
 
-variable "frontend_target_group_arn" {
-  description = "Frontend target group ARN"
-  type        = string
-}
+# ============================================================================
+# Target Group ARN
+# ============================================================================
+# REMOVED: frontend_target_group_arn variable
+# Target group attachment moved to root module to break circular dependency
 
 variable "frontend_instance_profile_name" {
   description = "IAM instance profile name for frontend EC2"
@@ -105,6 +106,11 @@ variable "frontend_instance_profile_name" {
 
 variable "aws_region" {
   description = "AWS region"
+  type        = string
+}
+
+variable "aws_profile" {
+  description = "AWS CLI profile name"
   type        = string
 }
 

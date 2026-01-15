@@ -31,3 +31,8 @@ output "frontend_private_ip" {
   description = "Frontend private IP"
   value       = aws_instance.frontend.private_ip
 }
+
+output "imported_certificate_arn" {
+  description = "ARN of the imported Let's Encrypt certificate from Certbot"
+  value       = data.aws_acm_certificate.imported.arn
+}

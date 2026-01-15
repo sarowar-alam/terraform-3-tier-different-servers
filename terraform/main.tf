@@ -82,11 +82,11 @@ module "ec2" {
   source = "./modules/ec2"
 
   # Networking
-  vpc_id                       = var.vpc_id
-  private_subnet_ids           = var.private_subnet_ids
-  frontend_security_group_id   = var.frontend_security_group_id
-  backend_security_group_id    = var.backend_security_group_id
-  database_security_group_id   = var.database_security_group_id
+  vpc_id                     = var.vpc_id
+  private_subnet_ids         = var.private_subnet_ids
+  frontend_security_group_id = var.frontend_security_group_id
+  backend_security_group_id  = var.backend_security_group_id
+  database_security_group_id = var.database_security_group_id
 
   # Instance Configuration
   ami_id                 = local.ami_id
@@ -103,6 +103,7 @@ module "ec2" {
   git_branch   = var.git_branch
   domain_name  = var.domain_name
   aws_region   = var.aws_region
+  aws_profile  = var.aws_profile
 
   # Database Configuration
   db_name     = var.db_name
@@ -113,9 +114,6 @@ module "ec2" {
   # Backend Configuration
   backend_port = var.backend_port
 
-  # ALB Target Group (from ALB module)
-  frontend_target_group_arn = module.alb.target_group_arn
-
   # Tags
   project_name = var.project_name
   environment  = var.environment
@@ -125,6 +123,7 @@ module "ec2" {
 # ============================================================================
 # ALB Module - Application Load Balancer
 # ============================================================================
+# ALB is created first, then HTTPS listener is added after certificate import
 
 module "alb" {
   source = "./modules/alb"
@@ -135,8 +134,11 @@ module "alb" {
   alb_security_group_id = var.alb_security_group_id
 
   # Domain Configuration
-  domain_name     = var.domain_name
-  hosted_zone_id  = var.hosted_zone_id
+  domain_name    = var.domain_name
+  hosted_zone_id = var.hosted_zone_id
+
+  # Certificate from Certbot import (will be populated after EC2 module completes)
+  certificate_arn = module.ec2.imported_certificate_arn
 
   # Tags
   project_name = var.project_name
@@ -156,14 +158,31 @@ module "dns" {
   domain_name    = var.domain_name
 
   # ALB Configuration
-  alb_dns_name    = module.alb.alb_dns_name
-  alb_zone_id     = module.alb.alb_zone_id
+  alb_dns_name = module.alb.alb_dns_name
+  alb_zone_id  = module.alb.alb_zone_id
 
-  # ACM Certificate Validation
-  certificate_validation_options = module.alb.certificate_validation_options
+  # Certificate validation handled by Certbot (no longer needed)
+  # certificate_validation_options = module.alb.certificate_validation_options
 
   # Tags
   project_name = var.project_name
   environment  = var.environment
   common_tags  = local.common_tags
+}
+# ============================================================================
+# Target Group Attachment - Frontend to ALB
+# ============================================================================
+# This resource is created in the root module to avoid circular dependency
+# between EC2 and ALB modules. It depends on the certificate being imported.
+
+resource "aws_lb_target_group_attachment" "frontend" {
+  target_group_arn = module.alb.target_group_arn
+  target_id        = module.ec2.frontend_instance_id
+  port             = 80
+
+  # Wait for certificate to be imported before attaching to ALB
+  depends_on = [
+    module.ec2,
+    module.alb
+  ]
 }

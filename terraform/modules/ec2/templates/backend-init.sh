@@ -2,6 +2,9 @@
 ################################################################################
 # Backend Server Initialization Script
 # This script sets up Node.js backend with PM2 process manager
+#
+# To re-run this script after initial boot:
+#   sudo bash /usr/local/bin/init-backend.sh
 ################################################################################
 
 set -e
@@ -12,8 +15,25 @@ exec 2>&1
 
 echo "=================================="
 echo "Backend Server Initialization"
-echo "Started: $(date)"
+echo "Started: $$(date)"
 echo "=================================="
+
+# Save this script to /usr/local/bin for manual re-runs
+if [ ! -f /usr/local/bin/init-backend.sh ]; then
+    cat <<'SCRIPT_EOF' > /usr/local/bin/init-backend.sh
+#!/bin/bash
+# This is a saved copy of the user-data script
+# Run with: sudo bash /usr/local/bin/init-backend.sh
+exec > >(tee -a /var/log/user-data-manual.log)
+exec 2>&1
+set -e
+SCRIPT_EOF
+    
+    # Append the rest of this script
+    tail -n +32 "$$0" >> /usr/local/bin/init-backend.sh 2>/dev/null || true
+    chmod +x /usr/local/bin/init-backend.sh
+    echo "Script saved to /usr/local/bin/init-backend.sh for manual re-runs"
+fi
 
 # Update system
 echo "Updating system packages..."
@@ -40,8 +60,8 @@ npm install -g pm2
 # Create application directory
 echo "Setting up application..."
 APP_DIR="/home/ubuntu/bmi-health-tracker"
-mkdir -p $APP_DIR
-cd $APP_DIR
+mkdir -p $$APP_DIR
+cd $$APP_DIR
 
 # Clone repository
 echo "Cloning repository..."
@@ -99,10 +119,10 @@ pm2 save
 pm2 startup systemd -u ubuntu --hp /home/ubuntu
 
 # Setup PM2 to start on boot
-env PATH=$PATH:/usr/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
+env PATH=$$PATH:/usr/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
 
 # Change ownership
-chown -R ubuntu:ubuntu $APP_DIR
+chown -R ubuntu:ubuntu $$APP_DIR
 chown -R ubuntu:ubuntu /home/ubuntu/.pm2
 
 # Verify backend is running

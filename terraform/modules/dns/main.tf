@@ -17,20 +17,6 @@ resource "aws_route53_record" "main" {
 # ============================================================================
 # ACM Certificate Validation Records
 # ============================================================================
-
-resource "aws_route53_record" "cert_validation" {
-  for_each = {
-    for dvo in var.certificate_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-  zone_id         = var.hosted_zone_id
-}
+# Certificate validation is handled by Certbot using DNS-01 challenge
+# Certbot will automatically create and remove TXT records in Route53
+# No manual validation records needed

@@ -12,7 +12,7 @@
 
 bucket         = "your-terraform-state-bucket-name"
 key            = "bmi-health-tracker/terraform.tfstate"
-region         = "us-east-1"
+region         = "ap-south-1"
 encrypt        = true
 profile        = "your-aws-profile-name"
 

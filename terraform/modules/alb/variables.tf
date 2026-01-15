@@ -27,6 +27,11 @@ variable "hosted_zone_id" {
   type        = string
 }
 
+variable "certificate_arn" {
+  description = "ARN of the imported Let's Encrypt certificate from Certbot"
+  type        = string
+}
+
 variable "project_name" {
   description = "Project name for resource naming"
   type        = string

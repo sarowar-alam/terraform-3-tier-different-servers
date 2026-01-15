@@ -65,13 +65,15 @@ output "target_group_arn" {
 # ============================================================================
 
 output "certificate_arn" {
-  description = "ACM certificate ARN (will be replaced by Let's Encrypt import)"
-  value       = module.alb.certificate_arn
+  description = "ARN of the imported Let's Encrypt certificate"
+  value       = module.ec2.imported_certificate_arn
 }
 
-output "letsencrypt_certificate_info" {
-  description = "Let's Encrypt certificate information"
+output "certificate_info" {
+  description = "Certificate information"
   value = {
+    status           = "Certificate created by Certbot and imported to ACM"
+    arn              = module.ec2.imported_certificate_arn
     domain           = var.domain_name
     certificate_path = "/etc/letsencrypt/live/${var.domain_name}/fullchain.pem"
     private_key_path = "/etc/letsencrypt/live/${var.domain_name}/privkey.pem"
@@ -132,13 +134,14 @@ output "ssh_commands" {
 output "deployment_info" {
   description = "Deployment information and next steps"
   value = {
-    status = "Infrastructure deployed successfully"
+    status = "Infrastructure deployed successfully with HTTPS"
     next_steps = [
-      "1. Wait 5-10 minutes for user_data scripts to complete",
-      "2. Check instance logs: AWS Console > EC2 > Instances > Select instance > Actions > Instance Settings > Get System Log",
-      "3. Verify health checks: ALB Target Groups should show 'healthy' status",
+      "1. Infrastructure deployed in ~10-15 minutes (includes certificate wait time)",
+      "2. Terraform automatically waited for Certbot to import certificate",
+      "3. ALB is configured with HTTPS and redirects HTTP to HTTPS",
       "4. Test application: https://${var.domain_name}",
-      "5. Monitor deployment: SSH to instances and check /var/log/user-data.log"
+      "5. Monitor deployment: SSH to instances and check /var/log/user-data.log",
+      "6. Certificate auto-renews via cron job on frontend instance"
     ]
   }
 }
