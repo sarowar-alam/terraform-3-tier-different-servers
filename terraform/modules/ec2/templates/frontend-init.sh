@@ -227,14 +227,46 @@ if [ -f "/etc/letsencrypt/live/${domain_name}/fullchain.pem" ]; then
     
     echo "Exporting certificate to AWS ACM..."
     
-    CERT_ARN=$(aws acm import-certificate \
-      --certificate fileb:///etc/letsencrypt/live/${domain_name}/cert.pem \
-      --certificate-chain fileb:///etc/letsencrypt/live/${domain_name}/chain.pem \
-      --private-key fileb:///etc/letsencrypt/live/${domain_name}/privkey.pem \
-      --tags Key=Name,Value=${domain_name}-letsencrypt Key=ManagedBy,Value=Certbot Key=Domain,Value=${domain_name} Key=Project,Value=bmi-health-tracker Key=TerraformManaged,Value=true \
-      --region ${aws_region} \
-      --query 'CertificateArn' \
-      --output text 2>&1) || echo "Warning: Certificate import failed"
+    # Check if we have a saved certificate ARN from previous runs
+    EXISTING_CERT_ARN=""
+    if [ -f "/tmp/certificate-arn.txt" ]; then
+        EXISTING_CERT_ARN=$(cat /tmp/certificate-arn.txt)
+        echo "Found saved certificate ARN: $EXISTING_CERT_ARN"
+    else
+        # Try to find existing certificate in ACM by domain tag
+        echo "Searching for existing certificate in ACM..."
+        EXISTING_CERT_ARN=$(aws acm list-certificates \
+          --region ${aws_region} \
+          --query "CertificateSummaryList[?DomainName=='${domain_name}'].CertificateArn" \
+          --output text 2>/dev/null | head -n1)
+        
+        if [ ! -z "$EXISTING_CERT_ARN" ]; then
+            echo "Found existing certificate in ACM: $EXISTING_CERT_ARN"
+        fi
+    fi
+    
+    # Import or update certificate
+    if [ ! -z "$EXISTING_CERT_ARN" ]; then
+        echo "Updating existing certificate: $EXISTING_CERT_ARN"
+        CERT_ARN=$(aws acm import-certificate \
+          --certificate-arn "$EXISTING_CERT_ARN" \
+          --certificate fileb:///etc/letsencrypt/live/${domain_name}/cert.pem \
+          --certificate-chain fileb:///etc/letsencrypt/live/${domain_name}/chain.pem \
+          --private-key fileb:///etc/letsencrypt/live/${domain_name}/privkey.pem \
+          --region ${aws_region} \
+          --query 'CertificateArn' \
+          --output text 2>&1) || echo "Warning: Certificate update failed"
+    else
+        echo "Importing new certificate to ACM..."
+        CERT_ARN=$(aws acm import-certificate \
+          --certificate fileb:///etc/letsencrypt/live/${domain_name}/cert.pem \
+          --certificate-chain fileb:///etc/letsencrypt/live/${domain_name}/chain.pem \
+          --private-key fileb:///etc/letsencrypt/live/${domain_name}/privkey.pem \
+          --tags Key=Name,Value=${domain_name}-letsencrypt Key=ManagedBy,Value=Certbot Key=Domain,Value=${domain_name} Key=Project,Value=bmi-health-tracker Key=TerraformManaged,Value=true \
+          --region ${aws_region} \
+          --query 'CertificateArn' \
+          --output text 2>&1) || echo "Warning: Certificate import failed"
+    fi
     
     if [ ! -z "$CERT_ARN" ]; then
         echo "Certificate imported to ACM!"
