@@ -15,7 +15,7 @@ exec 2>&1
 
 echo "=================================="
 echo "Database Server Initialization"
-echo "Started: $$(date)"
+echo "Started: $(date)"
 echo "=================================="
 
 # Save this script to /usr/local/bin for manual re-runs
@@ -76,7 +76,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO ${db_user};
 EOF
 
 # Configure PostgreSQL to listen on all interfaces
-PG_VERSION=$$(sudo -u postgres psql --version | awk '{print $3}' | cut -d. -f1)
+PG_VERSION=$$(sudo -u postgres psql --version | awk '{print $$3}' | cut -d. -f1)
 PG_CONF="/etc/postgresql/$${PG_VERSION}/main/postgresql.conf"
 PG_HBA="/etc/postgresql/$${PG_VERSION}/main/pg_hba.conf"
 

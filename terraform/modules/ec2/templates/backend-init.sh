@@ -15,7 +15,7 @@ exec 2>&1
 
 echo "=================================="
 echo "Backend Server Initialization"
-echo "Started: $$(date)"
+echo "Started: $(date)"
 echo "=================================="
 
 # Save this script to /usr/local/bin for manual re-runs
