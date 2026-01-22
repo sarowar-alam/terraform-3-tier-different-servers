@@ -62,8 +62,8 @@ nginx -v
 # Create application directory
 echo "Setting up application..."
 APP_DIR="/home/ubuntu/bmi-health-tracker"
-mkdir -p $$APP_DIR
-cd $$APP_DIR
+mkdir -p $${APP_DIR}
+cd $${APP_DIR}
 
 # Clone repository
 echo "Cloning repository..."
@@ -83,10 +83,10 @@ npm run build
 # Deploy to Nginx web root
 echo "Deploying frontend to Nginx..."
 WEB_ROOT="/var/www/bmi-health-tracker"
-mkdir -p $$WEB_ROOT
-cp -r dist/* $$WEB_ROOT/
-chown -R www-data:www-data $$WEB_ROOT
-chmod -R 755 $$WEB_ROOT
+mkdir -p $${WEB_ROOT}
+cp -r dist/* $${WEB_ROOT}/
+chown -R www-data:www-data $${WEB_ROOT}
+chmod -R 755 $${WEB_ROOT}
 
 # Configure Nginx
 echo "Configuring Nginx..."
@@ -186,7 +186,7 @@ sleep 5
 curl -f http://localhost/health || echo "Warning: Frontend health check failed"
 
 # Change ownership
-chown -R ubuntu:ubuntu $APP_DIR || echo "Warning: Could not change ownership"
+chown -R ubuntu:ubuntu $${APP_DIR} || echo "Warning: Could not change ownership"
 
 # ============================================================================
 # Let's Encrypt Certificate Generation
@@ -228,7 +228,8 @@ if [ -f "/etc/letsencrypt/live/${domain_name}/fullchain.pem" ]; then
     echo "Exporting certificate to AWS ACM..."
     
     CERT_ARN=$(aws acm import-certificate \
-      --certificate fileb:///etc/letsencrypt/live/${domain_name}/fullchain.pem \
+      --certificate fileb:///etc/letsencrypt/live/${domain_name}/cert.pem \
+      --certificate-chain fileb:///etc/letsencrypt/live/${domain_name}/chain.pem \
       --private-key fileb:///etc/letsencrypt/live/${domain_name}/privkey.pem \
       --tags Key=Name,Value=${domain_name}-letsencrypt Key=ManagedBy,Value=Certbot Key=Domain,Value=${domain_name} Key=Project,Value=bmi-health-tracker Key=TerraformManaged,Value=true \
       --region ${aws_region} \
@@ -359,12 +360,13 @@ CRON_EOF
 DOMAIN="${domain_name}"
 CERT_ARN_FILE="/tmp/certificate-arn.txt"
 
-if [ -f "$$CERT_ARN_FILE" ]; then
-    CERT_ARN=$$(cat "$$CERT_ARN_FILE")
+if [ -f "$${CERT_ARN_FILE}" ]; then
+    CERT_ARN=$$(cat "$${CERT_ARN_FILE}")
     aws acm import-certificate \
-      --certificate-arn "$$CERT_ARN" \
-      --certificate fileb:///etc/letsencrypt/live/$$DOMAIN/fullchain.pem \
-      --private-key fileb:///etc/letsencrypt/live/$$DOMAIN/privkey.pem \
+      --certificate-arn "$${CERT_ARN}" \
+      --certificate fileb:///etc/letsencrypt/live/$${DOMAIN}/cert.pem \
+      --certificate-chain fileb:///etc/letsencrypt/live/$${DOMAIN}/chain.pem \
+      --private-key fileb:///etc/letsencrypt/live/$${DOMAIN}/privkey.pem \
       --region ${aws_region} || echo "Failed to update ACM certificate"
 else
     echo "Certificate ARN file not found"
@@ -383,7 +385,7 @@ echo "Completed: $(date)"
 echo "=================================="
 echo "Frontend URL: http://localhost"
 echo "HTTPS URL: https://${domain_name}"
-echo "Web Root: $$WEB_ROOT"
+echo "Web Root: $${WEB_ROOT}"
 echo "Nginx Config: /etc/nginx/sites-available/bmi-health-tracker"
 echo "Certificate: /etc/letsencrypt/live/${domain_name}/"
 echo "=================================="
