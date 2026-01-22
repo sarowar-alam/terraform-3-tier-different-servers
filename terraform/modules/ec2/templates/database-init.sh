@@ -76,7 +76,8 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO ${db_user};
 EOF
 
 # Configure PostgreSQL to listen on all interfaces
-PG_VERSION=$$(sudo -u postgres psql --version | awk '{print $$3}' | cut -d. -f1)
+# Ubuntu 22.04 installs PostgreSQL 14 by default
+PG_VERSION="14"
 PG_CONF="/etc/postgresql/$${PG_VERSION}/main/postgresql.conf"
 PG_HBA="/etc/postgresql/$${PG_VERSION}/main/pg_hba.conf"
 
