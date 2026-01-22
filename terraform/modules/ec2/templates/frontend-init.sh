@@ -7,7 +7,8 @@
 #   sudo bash /usr/local/bin/init-frontend.sh
 ################################################################################
 
-set -e
+# Don't exit on errors - we want to continue and try Certbot
+set +e
 
 # Logging
 exec > >(tee -a /var/log/user-data.log)
@@ -157,10 +158,6 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
 
-    # Custom error pages
-    error_page 404 /index.html;
-    error_page 500 502 503 504 /index.html;
-
     # Logs
     access_log /var/log/nginx/bmi-access.log;
     error_log /var/log/nginx/bmi-error.log;
@@ -186,10 +183,10 @@ systemctl status nginx --no-pager
 # Test frontend
 echo "Testing frontend..."
 sleep 5
-curl -f http://localhost/ || echo "Warning: Frontend health check failed"
+curl -f http://localhost/health || echo "Warning: Frontend health check failed"
 
 # Change ownership
-chown -R ubuntu:ubuntu $$APP_DIR
+chown -R ubuntu:ubuntu $APP_DIR || echo "Warning: Could not change ownership"
 
 # ============================================================================
 # Let's Encrypt Certificate Generation
@@ -199,15 +196,7 @@ echo "=================================="
 echo "Generating Let's Encrypt Certificate"
 echo "=================================="
 
-# Extract base domain from full domain
-BASE_DOMAIN="$${domain_name#*.}"
-if [[ "$$BASE_DOMAIN" == "${domain_name}" ]]; then
-    # No subdomain, use as is
-    BASE_DOMAIN="${domain_name}"
-fi
-
 echo "Domain: ${domain_name}"
-echo "Base Domain: $$BASE_DOMAIN"
 
 # Wait for IAM role to propagate
 echo "Waiting for IAM role to propagate..."
@@ -217,11 +206,11 @@ sleep 30
 echo "Testing AWS credentials..."
 aws sts get-caller-identity || echo "Warning: AWS credentials not available yet"
 
-# Issue Let's Encrypt wildcard certificate
+# Issue Let's Encrypt certificate for single domain
 echo "Requesting Let's Encrypt certificate..."
 certbot certonly \
   --dns-route53 \
-  -d ${domain_name} -d "*.$$BASE_DOMAIN" \
+  -d ${domain_name} \
   --preferred-challenges dns \
   --agree-tos \
   --non-interactive \
@@ -238,18 +227,18 @@ if [ -f "/etc/letsencrypt/live/${domain_name}/fullchain.pem" ]; then
     
     echo "Exporting certificate to AWS ACM..."
     
-    CERT_ARN=$$(aws acm import-certificate \
+    CERT_ARN=$(aws acm import-certificate \
       --certificate fileb:///etc/letsencrypt/live/${domain_name}/fullchain.pem \
       --private-key fileb:///etc/letsencrypt/live/${domain_name}/privkey.pem \
       --tags Key=Name,Value=${domain_name}-letsencrypt Key=ManagedBy,Value=Certbot Key=Domain,Value=${domain_name} Key=Project,Value=bmi-health-tracker Key=TerraformManaged,Value=true \
       --region ${aws_region} \
       --query 'CertificateArn' \
-      --output text) || echo "Warning: Certificate import failed"
+      --output text 2>&1) || echo "Warning: Certificate import failed"
     
-    if [ ! -z "$$CERT_ARN" ]; then
+    if [ ! -z "$CERT_ARN" ]; then
         echo "Certificate imported to ACM!"
-        echo "Certificate ARN: $$CERT_ARN"
-        echo "$$CERT_ARN" > /tmp/certificate-arn.txt
+        echo "Certificate ARN: $CERT_ARN"
+        echo "$CERT_ARN" > /tmp/certificate-arn.txt
     fi
     
     # Update Nginx to use Let's Encrypt certificates

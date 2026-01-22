@@ -77,6 +77,12 @@ resource "aws_iam_role_policy" "acm_import" {
   })
 }
 
+# Attach AWS Managed SSM Policy for Session Manager
+resource "aws_iam_role_policy_attachment" "ssm_managed_instance_core" {
+  role       = aws_iam_role.frontend_certbot.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 # IAM Instance Profile
 resource "aws_iam_instance_profile" "frontend_certbot" {
   name = "${var.project_name}-frontend-certbot-profile"
