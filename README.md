@@ -335,14 +335,6 @@ For detailed troubleshooting, see [terraform/README.md](terraform/README.md).
 - [ ] Redis caching layer
 - [ ] CloudFront CDN for static assets
 
-## Contributing
-
-This project is part of the Ostad Batch-08 Module-06 coursework. For educational purposes.
-
-## License
-
-This project is created for educational purposes as part of the Ostad training program.
-
 ## Support & Contact
 
 For issues or questions:
