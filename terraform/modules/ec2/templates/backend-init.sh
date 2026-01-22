@@ -60,8 +60,8 @@ npm install -g pm2
 # Create application directory
 echo "Setting up application..."
 APP_DIR="/home/ubuntu/bmi-health-tracker"
-mkdir -p $$APP_DIR
-cd $$APP_DIR
+mkdir -p $${APP_DIR}
+cd $${APP_DIR}
 
 # Clone repository
 echo "Cloning repository..."
@@ -119,10 +119,10 @@ pm2 save
 pm2 startup systemd -u ubuntu --hp /home/ubuntu
 
 # Setup PM2 to start on boot
-env PATH=$$PATH:/usr/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
+env PATH=$${PATH}:/usr/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
 
 # Change ownership
-chown -R ubuntu:ubuntu $$APP_DIR
+chown -R ubuntu:ubuntu $${APP_DIR}
 chown -R ubuntu:ubuntu /home/ubuntu/.pm2
 
 # Verify backend is running

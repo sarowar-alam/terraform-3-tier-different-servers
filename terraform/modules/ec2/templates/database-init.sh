@@ -76,21 +76,21 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO ${db_user};
 EOF
 
 # Configure PostgreSQL to listen on all interfaces
-PG_VERSION=$$(psql --version | awk '{print $$3}' | cut -d. -f1)
-PG_CONF="/etc/postgresql/$$PG_VERSION/main/postgresql.conf"
-PG_HBA="/etc/postgresql/$$PG_VERSION/main/pg_hba.conf"
+PG_VERSION=$$(sudo -u postgres psql --version | awk '{print $3}' | cut -d. -f1)
+PG_CONF="/etc/postgresql/$${PG_VERSION}/main/postgresql.conf"
+PG_HBA="/etc/postgresql/$${PG_VERSION}/main/pg_hba.conf"
 
 echo "Configuring PostgreSQL connection settings..."
 
 # Update postgresql.conf
-sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" $$PG_CONF
-sed -i "s/max_connections = 100/max_connections = 200/" $$PG_CONF
-sed -i "s/shared_buffers = 128MB/shared_buffers = 256MB/" $$PG_CONF
+sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" $${PG_CONF}
+sed -i "s/max_connections = 100/max_connections = 200/" $${PG_CONF}
+sed -i "s/shared_buffers = 128MB/shared_buffers = 256MB/" $${PG_CONF}
 
 # Update pg_hba.conf to allow connections from VPC
-echo "host    all             all             10.0.0.0/8              md5" >> $$PG_HBA
-echo "host    all             all             172.16.0.0/12           md5" >> $$PG_HBA
-echo "host    all             all             192.168.0.0/16          md5" >> $$PG_HBA
+echo "host    all             all             10.0.0.0/8              md5" >> $${PG_HBA}
+echo "host    all             all             172.16.0.0/12           md5" >> $${PG_HBA}
+echo "host    all             all             192.168.0.0/16          md5" >> $${PG_HBA}
 
 # Restart PostgreSQL
 systemctl restart postgresql
@@ -108,9 +108,9 @@ echo "Running database migrations..."
 cd /tmp/bmi-app/backend/migrations
 
 for migration in *.sql; do
-    if [ -f "$$migration" ]; then
-        echo "Running migration: $$migration"
-        sudo -u postgres psql -d ${db_name} -f "$$migration"
+    if [ -f "$${migration}" ]; then
+        echo "Running migration: $${migration}"
+        sudo -u postgres psql -d ${db_name} -f "$${migration}"
     fi
 done
 
