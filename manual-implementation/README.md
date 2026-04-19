@@ -2168,14 +2168,6 @@ telnet 10.0.1.45 5432             # Database from backend
 
 ---
 
-## 🧑‍💻 Author
-
-**Md. Sarowar Alam**  
-Lead DevOps Engineer, Hogarth Worldwide
-
-📧 Email: sarowar@hotmail.com  
-🔗 LinkedIn: [linkedin.com/in/sarowar](https://linkedin.com/in/sarowar)
-
 **11.3 Wait for DNS Propagation** (2-5 minutes)
 
 ```bash
@@ -2379,10 +2371,9 @@ To remove all resources and avoid charges:
 
 ---
 
-## 🧑‍💻 Author
-
-**Md. Sarowar Alam**  
-Lead DevOps Engineer, Hogarth Worldwide
-
+*MD Sarowar Alam*  
+Lead DevOps Engineer, WPP Production
 📧 Email: sarowar@hotmail.com  
-🔗 LinkedIn: [linkedin.com/in/sarowar](https://linkedin.com/in/sarowar)
+🔗 LinkedIn: https://www.linkedin.com/in/sarowar/
+
+---

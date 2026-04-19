@@ -401,13 +401,6 @@ Approximate monthly costs (us-east-1):
 
 ---
 
-## 🧑‍💻 Author
-
-**Md. Sarowar Alam**  
-Lead DevOps Engineer, Hogarth Worldwide
-
-📧 Email: sarowar@hotmail.com  
-🔗 LinkedIn: [linkedin.com/in/sarowar](https://linkedin.com/in/sarowar)
    - Audit access logs regularly
 
 5. **Monitoring**
@@ -430,6 +423,11 @@ For issues or questions:
 - Review user data logs: `/var/log/user-data.log`
 - Consult Terraform documentation: https://www.terraform.io/docs
 
-## License
+---
 
-This infrastructure code is part of the BMI Health Tracker project.
+*MD Sarowar Alam*  
+Lead DevOps Engineer, WPP Production
+📧 Email: sarowar@hotmail.com  
+🔗 LinkedIn: https://www.linkedin.com/in/sarowar/
+
+---

@@ -173,10 +173,9 @@ https://github.com/sarowar-alam/terraform-3-tier-different-servers
 
 ---
 
-## 🧑‍💻 Author
-
-**Md. Sarowar Alam**  
-Lead DevOps Engineer, Hogarth Worldwide
-
+*MD Sarowar Alam*  
+Lead DevOps Engineer, WPP Production
 📧 Email: sarowar@hotmail.com  
-🔗 LinkedIn: [linkedin.com/in/sarowar](https://linkedin.com/in/sarowar)
+🔗 LinkedIn: https://www.linkedin.com/in/sarowar/
+
+---
