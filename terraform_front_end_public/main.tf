@@ -13,25 +13,6 @@
 # Data Sources
 # ----------------------------------------------------------------------------
 
-# Latest Ubuntu 22.04 LTS AMI from Canonical
-data "aws_ami" "ubuntu" {
-  most_recent = true
-  owners      = ["099720109477"] # Canonical
-
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
-  }
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-}
-
 # Route53 hosted zone — needed by both IAM (scoped policy) and Route53 modules
 data "aws_route53_zone" "main" {
   name         = var.hosted_zone_name
@@ -39,8 +20,7 @@ data "aws_route53_zone" "main" {
 }
 
 locals {
-  # Use explicitly supplied AMI if set, otherwise latest Ubuntu 22.04 LTS
-  ami_id = var.ami_id != "" ? var.ami_id : data.aws_ami.ubuntu.id
+  ami_id = var.ami_id
 }
 
 # ----------------------------------------------------------------------------
