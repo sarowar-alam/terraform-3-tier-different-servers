@@ -180,10 +180,12 @@ resource "null_resource" "generate_certificate" {
       Write-Host "=============================================="
 
       # Send SSM Run Command to the frontend instance
+      # Use single-quoted variable to avoid AWS CLI v2 / PowerShell escaping issues
+      $ssmParams = 'commands=["/usr/local/bin/generate-certificate.sh"]'
       $sendOutput = aws ssm send-command `
         --instance-ids $instanceId `
         --document-name "AWS-RunShellScript" `
-        --parameters "commands=[\"/usr/local/bin/generate-certificate.sh\"]" `
+        --parameters $ssmParams `
         --timeout-seconds 600 `
         --region $region `
         --profile $profile `
