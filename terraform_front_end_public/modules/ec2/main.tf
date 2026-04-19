@@ -274,11 +274,25 @@ resource "aws_instance" "frontend" {
 }
 
 # ----------------------------------------------------------------------------
+# Associate Elastic IP with frontend IMMEDIATELY after instance creation.
+# The frontend is in a PUBLIC subnet -- without a public IP it has no outbound
+# internet and cannot reach SSM endpoints. Must happen before SSM polling.
+# ----------------------------------------------------------------------------
+
+resource "aws_eip_association" "frontend" {
+  instance_id   = aws_instance.frontend.id
+  allocation_id = aws_eip.frontend.id
+
+  depends_on = [aws_instance.frontend]
+}
+
+# ----------------------------------------------------------------------------
 # Wait: poll SSM until frontend instance is Online
+# depends_on EIP association -- SSM agent needs the public IP to phone home.
 # ----------------------------------------------------------------------------
 
 resource "null_resource" "wait_ssm_frontend" {
-  depends_on = [aws_instance.frontend]
+  depends_on = [aws_eip_association.frontend]
 
   provisioner "local-exec" {
     interpreter = ["PowerShell", "-Command"]
@@ -324,17 +338,4 @@ resource "null_resource" "wait_ssm_frontend" {
   triggers = {
     instance_id = aws_instance.frontend.id
   }
-}
-
-# ----------------------------------------------------------------------------
-# Associate Elastic IP with frontend instance
-# Both the EIP association and SSM wait must complete before root module
-# creates the Route53 record — enforced via depends_on = [module.ec2] in root.
-# ----------------------------------------------------------------------------
-
-resource "aws_eip_association" "frontend" {
-  instance_id   = aws_instance.frontend.id
-  allocation_id = aws_eip.frontend.id
-
-  depends_on = [aws_instance.frontend]
 }
