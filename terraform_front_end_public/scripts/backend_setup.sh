@@ -83,8 +83,9 @@ git clone -b ${git_branch} ${git_repo} . || {
 
 cd backend
 
-# Create .env — single-quoted heredoc so bash does NOT expand $ in values
-# (Terraform has already substituted all ${varname} template vars above)
+# Create .env — single-quoted heredoc so bash does NOT expand dollar-signs in
+# substituted values (e.g. a db_password that contains a dollar sign).
+# Terraform templatefile has already replaced all template variables above.
 cat > .env << 'ENV_EOF'
 # Database
 DATABASE_URL=postgresql://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}
