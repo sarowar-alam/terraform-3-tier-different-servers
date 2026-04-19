@@ -3,7 +3,7 @@
 #
 # database  : AmazonSSMManagedInstanceCore only
 # backend   : AmazonSSMManagedInstanceCore only
-# frontend  : AmazonSSMManagedInstanceCore + Route53 (Certbot DNS-01 challenge)
+# frontend  : AmazonSSMManagedInstanceCore + Route53 (read-only, kept for future use)
 # ============================================================================
 
 # ============================================================================

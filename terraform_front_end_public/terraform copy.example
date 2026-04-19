@@ -1,0 +1,66 @@
+# ============================================================================
+# terraform.tfvars
+# All variables are explicitly set here.
+# Fill in every placeholder marked with  <-- FILL IN  before running apply.
+# This file is git-ignored — never commit it.
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# AWS Authentication
+# ----------------------------------------------------------------------------
+aws_region  = "ap-south-1"
+aws_profile = "sarowar-ostad"
+
+# ----------------------------------------------------------------------------
+# Project
+# ----------------------------------------------------------------------------
+project_name = "fpub-trfm"
+environment  = "production"
+
+common_tags = {
+  Owner   = "sarowar-ostad"
+  Module  = "module-06"
+}
+
+# ----------------------------------------------------------------------------
+# Networking
+# ----------------------------------------------------------------------------
+vpc_cidr             = "10.0.0.0/16"
+public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
+availability_zones   = ["ap-south-1a", "ap-south-1b"]
+
+# ----------------------------------------------------------------------------
+# EC2 Instances
+# ----------------------------------------------------------------------------
+ami_id                 = "ami-05d2d839d4f73aafb"   # Ubuntu 24.04 LTS (Noble) ap-south-1
+instance_type_frontend = "t3.small"
+instance_type_backend  = "t3.small"
+instance_type_database = "t3.medium"
+
+key_name = "sarowar-ostad-mumbai"      # <-- FILL IN: name of your EC2 key pair
+
+# SSH access to frontend — MUST be your own IP only (CIDR /32)
+# Find your IP: https://checkip.amazonaws.com
+ssh_allowed_cidrs = ["182.163.115.106/32"]   # <-- FILL IN  e.g. ["203.0.113.5/32"]
+
+# ----------------------------------------------------------------------------
+# Application
+# ----------------------------------------------------------------------------
+git_repo_url = "https://github.com/sarowar-alam/terraform-3-tier-different-servers.git"  # <-- FILL IN
+git_branch   = "main"
+backend_port = 3000
+
+# ----------------------------------------------------------------------------
+# Domain / DNS
+# ----------------------------------------------------------------------------
+domain_name      = "bmi-terraform.ostaddevops.click"
+hosted_zone_name = "ostaddevops.click"
+
+# ----------------------------------------------------------------------------
+# Database
+# ----------------------------------------------------------------------------
+db_name     = "bmidb"
+db_user     = "bmi_user"
+db_password = "0stad2025"    # <-- FILL IN — use a strong password
+db_port     = 5432

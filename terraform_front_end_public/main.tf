@@ -158,7 +158,7 @@ module "route53" {
 # ----------------------------------------------------------------------------
 # Certificate Generation
 # Triggers Certbot on the frontend server via SSM Run Command AFTER the
-# Route53 A record exists (required for DNS-01 TXT validation to work).
+# Route53 A record resolves to the EIP (required for HTTP-01 challenge).
 # ----------------------------------------------------------------------------
 
 resource "null_resource" "generate_certificate" {
@@ -240,6 +240,8 @@ resource "null_resource" "generate_certificate" {
 
           if ($finalStatus -in @("Failed","Cancelled","TimedOut","DeliveryTimedOut")) {
             Write-Host "ERROR: Certificate generation failed (status: $finalStatus)"
+            Write-Host "--- stdout (certbot output) ---"
+            Write-Host $inv.StandardOutputContent
             Write-Host "--- stderr ---"
             Write-Host $inv.StandardErrorContent
             Write-Host ""

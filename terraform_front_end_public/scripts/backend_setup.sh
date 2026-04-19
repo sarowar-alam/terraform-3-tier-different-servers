@@ -42,9 +42,12 @@ apt-get install -y nodejs
 node --version
 npm  --version
 
-# Install PM2
+# Install PM2 globally
 npm install -g pm2
 pm2 --version
+
+# Ensure HOME is set — user_data runs as root and HOME may not be defined
+export HOME=/root
 
 # ----------------------------------------------------------------------------
 # Wait for database to be reachable before continuing
@@ -120,12 +123,15 @@ pm2 delete bmi-backend 2>/dev/null || true
 pm2 start src/server.js --name bmi-backend --time
 pm2 save
 
-# Register PM2 startup script (run as ubuntu, configure for systemd)
-env PATH=$${PATH}:/usr/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu | tail -1 | bash || true
+# Register PM2 startup — grep the generated sudo command and run it directly
+# (piping to tail -1 | bash breaks when output contains dollar signs)
+PM2_STARTUP=$(env PATH=$${PATH}:/usr/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu 2>&1 | grep 'sudo ' | head -1 || true)
+if [ -n "$${PM2_STARTUP}" ]; then
+  eval "$${PM2_STARTUP}" || true
+fi
 
 # Fix ownership
-chown -R ubuntu:ubuntu $${APP_DIR}
-chown -R ubuntu:ubuntu /home/ubuntu/.pm2
+chown -R ubuntu:ubuntu $${APP_DIR} 2>/dev/null || true
 
 # ----------------------------------------------------------------------------
 # Health check

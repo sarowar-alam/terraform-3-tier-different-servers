@@ -6,8 +6,8 @@
 #   aws_region, cert_script
 #
 # This script:
-#   1. Waits for backend to be healthy before proceeding
-#   2. Installs Nginx, Node.js, Certbot, AWS CLI
+#   1. Installs Nginx, Node.js, snap Certbot (HTTP-01 — no AWS CLI needed)
+#   2. Waits for backend health endpoint before building
 #   3. Builds and deploys the React frontend
 #   4. Configures Nginx with HTTP-only config initially
 #   5. Writes /usr/local/bin/generate-certificate.sh (run later via SSM)
@@ -33,13 +33,20 @@ DEBIAN_FRONTEND=noninteractive apt-get upgrade -y -qq
 # ----------------------------------------------------------------------------
 # Install required packages
 # ----------------------------------------------------------------------------
-echo "[2/8] Installing Nginx, Certbot, AWS CLI, Node.js, git..."
+echo "[2/8] Installing Nginx, Node.js, git, snap certbot..."
 DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
-  git curl build-essential nginx netcat-openbsd \
-  certbot python3-certbot-dns-route53 python3-certbot-nginx \
-  awscli
+  git curl build-essential nginx netcat-openbsd snapd
 
-# Verify SSM agent is running (pre-installed on Ubuntu 22.04 AWS AMIs)
+# Install certbot via snap — official recommended method on Ubuntu 24.04
+# HTTP-01 challenge (--nginx): no AWS credentials or DNS plugin required.
+# Requires port 80 open and A record pointing to this server's EIP.
+echo "Installing certbot via snap..."
+systemctl start snapd.socket 2>/dev/null || true
+snap install --classic certbot
+ln -sf /snap/bin/certbot /usr/bin/certbot
+certbot --version
+
+# Verify SSM agent is running (pre-installed on Ubuntu 24.04 AWS AMIs)
 echo "Verifying SSM agent..."
 systemctl enable snap.amazon-ssm-agent.amazon-ssm-agent.service 2>/dev/null || true
 systemctl start  snap.amazon-ssm-agent.amazon-ssm-agent.service 2>/dev/null || \
