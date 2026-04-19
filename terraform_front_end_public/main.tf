@@ -89,6 +89,11 @@ module "security_groups" {
 module "ec2" {
   source = "./modules/ec2"
 
+  # Wait for the ENTIRE vpc module (NAT Gateway + route tables) before creating
+  # any EC2 instance. Without this, private instances boot before the NAT GW is
+  # ready and can't reach SSM endpoints, causing wait_ssm_* to time out.
+  depends_on = [module.vpc, module.iam, module.security_groups]
+
   project_name = var.project_name
   environment  = var.environment
   ami_id       = local.ami_id
