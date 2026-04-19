@@ -179,17 +179,21 @@ resource "null_resource" "generate_certificate" {
       Write-Host " Domain   : $domain"
       Write-Host "=============================================="
 
-      # Send SSM Run Command to the frontend instance
-      # Use single-quoted variable to avoid AWS CLI v2 / PowerShell escaping issues
-      $ssmParams = 'commands=["/usr/local/bin/generate-certificate.sh"]'
+      # Write SSM parameters to a temp JSON file to avoid AWS CLI v2 / Windows
+      # quoting issues with [ ] characters in --parameters values.
+      $tmpParams = "$env:TEMP\ssm-params-$(New-Guid).json"
+      Set-Content -Path $tmpParams -Value '{"commands":["/usr/local/bin/generate-certificate.sh"]}' -Encoding UTF8
+
       $sendOutput = aws ssm send-command `
         --instance-ids $instanceId `
         --document-name "AWS-RunShellScript" `
-        --parameters $ssmParams `
+        --parameters "file://$tmpParams" `
         --timeout-seconds 600 `
         --region $region `
         --profile $profile `
         --output json
+
+      Remove-Item $tmpParams -ErrorAction SilentlyContinue -Force
 
       if ($LASTEXITCODE -ne 0) {
         Write-Host "ERROR: Failed to send SSM Run Command"
