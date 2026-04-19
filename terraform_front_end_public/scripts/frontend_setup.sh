@@ -188,13 +188,26 @@ curl -sf http://localhost/health && echo "  Nginx OK" || echo "  WARNING: Nginx 
 # dig loops every 30 s — usually resolves within 1-2 minutes.
 # ----------------------------------------------------------------------------
 echo "[7/8] Waiting for DNS ${domain_name} to resolve to this server, then issuing cert..."
-MY_IP=$(curl -sf http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null || echo "unknown")
-echo "  This server EIP : $${MY_IP}"
+# IMDSv2: fetch a session token first (required on Ubuntu 24.04 — plain curl returns 401)
+IMDS_TOKEN=$(curl -sf -X PUT "http://169.254.169.254/latest/api/token" \
+  -H "X-aws-ec2-metadata-token-ttl-seconds: 21600" 2>/dev/null || echo "")
+if [ -n "$${IMDS_TOKEN}" ]; then
+  MY_IP=$(curl -sf -H "X-aws-ec2-metadata-token: $${IMDS_TOKEN}" \
+    "http://169.254.169.254/latest/meta-data/public-ipv4" 2>/dev/null || echo "")
+else
+  MY_IP=$(curl -sf "http://169.254.169.254/latest/meta-data/public-ipv4" 2>/dev/null || echo "")
+fi
+echo "  This server EIP : $${MY_IP:-unknown}"
 for i in $(seq 1 60); do
   RESOLVED=$(dig +short "${domain_name}" A 2>/dev/null | head -1)
-  echo "  [$${i}/60] ${domain_name} -> $${RESOLVED:-none}  (need $${MY_IP})"
-  if [ "$${RESOLVED}" = "$${MY_IP}" ]; then
+  echo "  [$${i}/60] ${domain_name} -> $${RESOLVED:-none}  (need $${MY_IP:-any})"
+  # Exact match when IMDS gave us our IP; fallback: any non-empty resolution is
+  # correct — Terraform is the only writer of this A record (points to this EIP).
+  if [ -n "$${MY_IP}" ] && [ "$${RESOLVED}" = "$${MY_IP}" ]; then
     echo "  DNS resolved — running certbot --nginx"
+    break
+  elif [ -z "$${MY_IP}" ] && [ -n "$${RESOLVED}" ]; then
+    echo "  DNS resolved (IMDS unavailable, trusting Terraform A record) — running certbot --nginx"
     break
   fi
   sleep 30
