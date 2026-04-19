@@ -29,7 +29,7 @@ echo "[2/7] Installing dependencies..."
 DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
   git curl build-essential netcat-openbsd
 
-# Verify SSM agent is running (pre-installed on Ubuntu 22.04 AWS AMIs)
+# Verify SSM agent is running (pre-installed on Ubuntu 24.04 AWS AMIs)
 echo "Verifying SSM agent..."
 systemctl enable snap.amazon-ssm-agent.amazon-ssm-agent.service 2>/dev/null || true
 systemctl start  snap.amazon-ssm-agent.amazon-ssm-agent.service 2>/dev/null || \

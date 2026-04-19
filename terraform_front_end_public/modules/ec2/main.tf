@@ -23,7 +23,6 @@
 locals {
   cert_script = templatefile("${path.root}/scripts/generate_certificate.sh", {
     domain_name = var.domain_name
-    aws_region  = var.aws_region
   })
 }
 

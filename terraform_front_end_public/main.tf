@@ -45,7 +45,7 @@ module "vpc" {
 # Creates: 3 IAM roles + instance profiles
 #   database  — SSM only
 #   backend   — SSM only
-#   frontend  — SSM + Route53 (for Certbot DNS-01 challenge)
+#   frontend  — SSM + Route53 (read-only; kept for future use)
 # ----------------------------------------------------------------------------
 
 module "iam" {
@@ -183,7 +183,7 @@ resource "null_resource" "generate_certificate" {
       # The command waits up to 25 min for user_data to finish writing the
       # cert script (SSM Online != user_data complete), then runs cert gen.
       # SSM timeout = 1800s (30 min) to cover worst-case: 20 min user_data
-      # + 10 min cert generation (certbot DNS-01 + Nginx reload).
+      # + 10 min cert generation (certbot --nginx HTTP-01 + Nginx reload).
       $tmpParams = [System.IO.Path]::GetTempFileName() + ".json"
       $jsonContent = @'
 {"commands":["timeout 1500 bash -c 'until [ -f /usr/local/bin/generate-certificate.sh ]; do echo Waiting for cert script...; sleep 15; done' && bash /usr/local/bin/generate-certificate.sh"]}

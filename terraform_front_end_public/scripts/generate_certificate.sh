@@ -1,7 +1,7 @@
 #!/bin/bash
 ################################################################################
 # Certificate Generation Script — HTTP-01 via certbot --nginx
-# Templatefile variables: domain_name, aws_region
+# Templatefile variables: domain_name
 #
 # Written to /usr/local/bin/generate-certificate.sh by frontend_setup.sh.
 # Executed via SSM Run Command from Terraform AFTER the Route53 A record
