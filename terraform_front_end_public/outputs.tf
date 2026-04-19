@@ -89,7 +89,7 @@ output "nat_gateway_ip" {
 
 output "route53_record_fqdn" {
   description = "Fully qualified domain name created in Route53"
-  value       = module.route53.record_fqdn
+  value       = var.domain_name
 }
 
 # ----------------------------------------------------------------------------

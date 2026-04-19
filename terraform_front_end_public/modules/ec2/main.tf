@@ -10,21 +10,10 @@
 #      └─ null_resource.wait_ssm_frontend  [polls SSM until Online]
 #   4. aws_eip_association.frontend  (stable public IP attached to frontend)
 #
-# The cert script is written to /usr/local/bin/generate-certificate.sh during
-# frontend user_data. It is triggered LATER by SSM Run Command from root
-# main.tf after Route53 is configured.
+# Route53 A record is created inside this module right after wait_ssm_backend
+# so the frontend boots with DNS already live. certbot --nginx runs inline
+# in user_data — no SSM Run Command needed.
 # ============================================================================
-
-# ----------------------------------------------------------------------------
-# Locals — pre-render the certificate script so it can be embedded in
-# frontend_setup.sh as a templatefile variable (avoids nested templatefile calls)
-# ----------------------------------------------------------------------------
-
-locals {
-  cert_script = templatefile("${path.root}/scripts/generate_certificate.sh", {
-    domain_name = var.domain_name
-  })
-}
 
 # ----------------------------------------------------------------------------
 # Elastic IP — stable public IP for the frontend server
@@ -229,10 +218,27 @@ resource "null_resource" "wait_ssm_backend" {
 }
 
 # ============================================================================
+# Route53 A record — created right after backend SSM is Online and EIP exists.
+# Frontend instance depends_on this so DNS resolves before user_data boots.
+# certbot --nginx runs inline in user_data once the DNS poll confirms resolution.
+# ============================================================================
+
+resource "aws_route53_record" "frontend" {
+  depends_on = [null_resource.wait_ssm_backend]
+
+  zone_id = var.hosted_zone_id
+  name    = var.domain_name
+  type    = "A"
+  ttl     = 60
+
+  records         = [aws_eip.frontend.public_ip]
+  allow_overwrite = true
+}
+
+# ============================================================================
 # 3. FRONTEND INSTANCE
-#    Only created after backend SSM wait passes.
-#    user_data smart-polls backend :3000/health before building.
-#    Writes /usr/local/bin/generate-certificate.sh but does NOT run it yet.
+#    Only created AFTER Route53 A record is live (domain → EIP).
+#    user_data polls DNS until resolved, then runs certbot --nginx inline.
 # ============================================================================
 
 resource "aws_instance" "frontend" {
@@ -244,8 +250,8 @@ resource "aws_instance" "frontend" {
   iam_instance_profile        = var.frontend_instance_profile_name
   associate_public_ip_address = false # We attach an Elastic IP instead
 
-  # Do not create frontend until backend SSM is confirmed Online
-  depends_on = [null_resource.wait_ssm_backend]
+  # Do not create frontend until Route53 A record is live (certbot needs DNS)
+  depends_on = [aws_route53_record.frontend]
 
   user_data_replace_on_change = true
 
@@ -255,8 +261,6 @@ resource "aws_instance" "frontend" {
     domain_name  = var.domain_name
     git_repo     = var.git_repo_url
     git_branch   = var.git_branch
-    aws_region   = var.aws_region
-    cert_script  = local.cert_script
   })
 
   root_block_device {
@@ -319,7 +323,7 @@ resource "null_resource" "wait_ssm_frontend" {
         Write-Host "    [$attempt/$maxAttempts] SSM PingStatus = $status"
 
         if ($status -eq "Online") {
-          Write-Host ">>> [FRONTEND] SSM Online. Ready for Route53 and certificate."
+          Write-Host ">>> [FRONTEND] SSM Online. Certificate already issued via user_data."
           break
         }
 

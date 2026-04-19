@@ -35,7 +35,7 @@ DEBIAN_FRONTEND=noninteractive apt-get upgrade -y -qq
 # ----------------------------------------------------------------------------
 echo "[2/8] Installing Nginx, Node.js, git, snap certbot..."
 DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
-  git curl build-essential nginx netcat-openbsd snapd
+  git curl build-essential nginx netcat-openbsd snapd dnsutils
 
 # Install certbot via snap — official recommended method on Ubuntu 24.04
 # HTTP-01 challenge (--nginx): no AWS credentials or DNS plugin required.
@@ -183,18 +183,42 @@ sleep 3
 curl -sf http://localhost/health && echo "  Nginx OK" || echo "  WARNING: Nginx health check failed"
 
 # ----------------------------------------------------------------------------
-# Write the certificate generation script
-# (Terraform rendered this template separately; the content is injected here)
-# It will be executed later via SSM Run Command from Terraform AFTER Route53
-# A record is in place.
+# Poll DNS until the domain resolves to this server's EIP, then run certbot.
+# Route53 A record was created before this instance booted (ec2/main.tf).
+# dig loops every 30 s — usually resolves within 1-2 minutes.
 # ----------------------------------------------------------------------------
-echo "[7/8] Writing /usr/local/bin/generate-certificate.sh..."
+echo "[7/8] Waiting for DNS ${domain_name} to resolve to this server, then issuing cert..."
+MY_IP=$(curl -sf http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null || echo "unknown")
+echo "  This server EIP : $${MY_IP}"
+for i in $(seq 1 60); do
+  RESOLVED=$(dig +short "${domain_name}" A 2>/dev/null | head -1)
+  echo "  [$${i}/60] ${domain_name} -> $${RESOLVED:-none}  (need $${MY_IP})"
+  if [ "$${RESOLVED}" = "$${MY_IP}" ]; then
+    echo "  DNS resolved — running certbot --nginx"
+    break
+  fi
+  sleep 30
+done
 
-cat > /usr/local/bin/generate-certificate.sh << 'GENERATE_CERT_SCRIPT_EOF'
-${cert_script}
-GENERATE_CERT_SCRIPT_EOF
+certbot --nginx \
+  -d "${domain_name}" \
+  --agree-tos \
+  --non-interactive \
+  --email "admin@${domain_name}" \
+  --keep-until-expiring \
+  --redirect
 
-chmod +x /usr/local/bin/generate-certificate.sh
+if [ -f "/etc/letsencrypt/live/${domain_name}/fullchain.pem" ]; then
+  echo "  Certificate issued successfully!"
+  openssl x509 -in "/etc/letsencrypt/live/${domain_name}/fullchain.pem" -noout -subject -dates
+  cat > /etc/cron.d/certbot-renew << 'CRON_EOF'
+0 0,12 * * * root certbot renew --quiet --deploy-hook "systemctl reload nginx"
+CRON_EOF
+  chmod 644 /etc/cron.d/certbot-renew
+else
+  echo "WARNING: certbot did not issue a cert — retry manually:"
+  echo "  sudo certbot --nginx -d ${domain_name} --agree-tos --non-interactive --email admin@${domain_name} --redirect"
+fi
 
 # Fix ownership
 chown -R ubuntu:ubuntu $${APP_DIR}
@@ -209,8 +233,4 @@ echo " Frontend Initialization Complete — $(date)"
 echo " Host     : $(hostname -I | awk '{print $1}')"
 echo " Web Root : $${WEB_ROOT}"
 echo " Domain   : ${domain_name}"
-echo " Cert Cmd : /usr/local/bin/generate-certificate.sh"
-echo "======================================================"
-echo "Next: Terraform will trigger certificate generation via"
-echo "      SSM Run Command once Route53 A record is live."
 echo "======================================================"

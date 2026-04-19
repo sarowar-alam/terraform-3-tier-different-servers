@@ -153,3 +153,8 @@ variable "db_port" {
   description = "PostgreSQL port"
   type        = number
 }
+
+variable "hosted_zone_id" {
+  description = "Route53 hosted zone ID — Route53 A record is created inside this module before the frontend boots"
+  type        = string
+}
