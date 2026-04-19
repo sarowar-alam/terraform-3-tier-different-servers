@@ -83,8 +83,9 @@ git clone -b ${git_branch} ${git_repo} . || {
 
 cd backend
 
-# Create .env with all required configuration
-cat > .env << ENV_EOF
+# Create .env — single-quoted heredoc so bash does NOT expand $ in values
+# (Terraform has already substituted all ${varname} template vars above)
+cat > .env << 'ENV_EOF'
 # Database
 DATABASE_URL=postgresql://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}
 DB_HOST=${db_host}

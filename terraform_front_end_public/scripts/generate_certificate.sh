@@ -57,7 +57,7 @@ echo "  Using DNS-01 challenge via Route53 (no port 80/443 required)"
 
 certbot certonly \
   --dns-route53 \
-  --dns-route53-propagation-seconds 30 \
+  --dns-route53-propagation-seconds 60 \
   -d "$${DOMAIN}" \
   --agree-tos \
   --non-interactive \

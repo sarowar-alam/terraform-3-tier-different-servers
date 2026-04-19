@@ -179,16 +179,22 @@ resource "null_resource" "generate_certificate" {
       Write-Host " Domain   : $domain"
       Write-Host "=============================================="
 
-      # Write SSM parameters to a temp JSON file to avoid AWS CLI v2 / Windows
-      # quoting issues with [ ] characters in --parameters values.
-      $tmpParams = "$env:TEMP\ssm-params-$(New-Guid).json"
-      Set-Content -Path $tmpParams -Value '{"commands":["/usr/local/bin/generate-certificate.sh"]}' -Encoding UTF8
+      # Write SSM parameters to a temp JSON file (no BOM).
+      # The command waits up to 25 min for user_data to finish writing the
+      # cert script (SSM Online != user_data complete), then runs cert gen.
+      # SSM timeout = 1800s (30 min) to cover worst-case: 20 min user_data
+      # + 10 min cert generation (certbot DNS-01 + Nginx reload).
+      $tmpParams = [System.IO.Path]::GetTempFileName() + ".json"
+      $jsonContent = @'
+{"commands":["timeout 1500 bash -c 'until [ -f /usr/local/bin/generate-certificate.sh ]; do echo Waiting for cert script...; sleep 15; done' && bash /usr/local/bin/generate-certificate.sh"]}
+'@
+      [System.IO.File]::WriteAllText($tmpParams, $jsonContent.Trim(), [System.Text.UTF8Encoding]::new($false))
 
       $sendOutput = aws ssm send-command `
         --instance-ids $instanceId `
         --document-name "AWS-RunShellScript" `
         --parameters "file://$tmpParams" `
-        --timeout-seconds 600 `
+        --timeout-seconds 1800 `
         --region $region `
         --profile $profile `
         --output json
@@ -202,9 +208,9 @@ resource "null_resource" "generate_certificate" {
 
       $cmdId = ($sendOutput | ConvertFrom-Json).Command.CommandId
       Write-Host "SSM Command ID : $cmdId"
-      Write-Host "Polling for completion (max 10 minutes)..."
+      Write-Host "Polling for completion (max 30 minutes)..."
 
-      $maxAttempts = 20
+      $maxAttempts = 60
       $attempt     = 0
       $finalStatus = "Pending"
 
