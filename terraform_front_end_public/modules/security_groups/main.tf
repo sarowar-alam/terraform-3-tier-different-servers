@@ -12,12 +12,12 @@
 
 resource "aws_security_group" "frontend" {
   name        = "${var.project_name}-frontend-sg"
-  description = "Frontend server — SSH restricted, HTTP/HTTPS open to internet"
+  description = "Frontend server - SSH restricted, HTTP/HTTPS open to internet"
   vpc_id      = var.vpc_id
 
   # SSH — your IP only (enforced via terraform.tfvars)
   ingress {
-    description = "SSH — restricted to operator IP"
+    description = "SSH - restricted to operator IP"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -66,7 +66,7 @@ resource "aws_security_group" "frontend" {
 
 resource "aws_security_group" "backend" {
   name        = "${var.project_name}-backend-sg"
-  description = "Backend server — only reachable from frontend SG"
+  description = "Backend server - only reachable from frontend SG"
   vpc_id      = var.vpc_id
 
   # Application port — from frontend only
@@ -108,7 +108,7 @@ resource "aws_security_group" "backend" {
 
 resource "aws_security_group" "database" {
   name        = "${var.project_name}-database-sg"
-  description = "Database server — PostgreSQL from backend only, SSH from frontend only"
+  description = "Database server - PostgreSQL from backend only, SSH from frontend only"
   vpc_id      = var.vpc_id
 
   # PostgreSQL — from backend SG only

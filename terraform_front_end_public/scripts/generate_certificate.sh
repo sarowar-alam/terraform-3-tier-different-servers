@@ -193,7 +193,7 @@ certbot renew --dry-run --quiet 2>&1 && echo "  Dry-run renewal OK" || echo "  W
 # ----------------------------------------------------------------------------
 echo "[5/5] Smoke testing HTTPS..."
 sleep 3
-HTTP_STATUS=$(curl -sk -o /dev/null -w "%{http_code}" "https://$${DOMAIN}/health" 2>/dev/null || echo "000")
+HTTP_STATUS=$(curl -sk -o /dev/null -w "%%{http_code}" "https://$${DOMAIN}/health" 2>/dev/null || echo "000")
 echo "  https://$${DOMAIN}/health → HTTP $${HTTP_STATUS}"
 if [ "$${HTTP_STATUS}" = "200" ]; then
   echo "  HTTPS working correctly!"
