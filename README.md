@@ -349,6 +349,10 @@ For issues or questions:
 
 **Last Updated**: January 15, 2026
 
+**Terraform Version**: >= 1.0
+
+**AWS Provider**: ~> 5.0
+
 ---
 
 ## Author
@@ -359,7 +363,3 @@ Lead DevOps Engineer, WPP Production
 🔗 LinkedIn: https://www.linkedin.com/in/sarowar/
 
 ---
-
-**Terraform Version**: >= 1.0
-
-**AWS Provider**: ~> 5.0
