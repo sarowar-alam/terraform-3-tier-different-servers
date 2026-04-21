@@ -10,11 +10,11 @@
 # IMPORTANT: Add this file to .gitignore - it may contain sensitive info!
 # ============================================================================
 
-bucket         = "your-terraform-state-bucket-name"
+bucket         = "batch-10-tf-states"
 key            = "bmi-health-tracker/terraform.tfstate"
 region         = "ap-south-1"
 encrypt        = true
-profile        = "your-aws-profile-name"
+profile        = "sarowar-ostad"
 
 # Optional: DynamoDB table for state locking
 # Prevents concurrent terraform operations

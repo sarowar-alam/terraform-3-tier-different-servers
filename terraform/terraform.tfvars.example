@@ -1,37 +1,37 @@
 # ============================================================================
 # AWS Configuration
 # ============================================================================
-aws_region  = "us-east-1"
-aws_profile = "your-aws-profile-name"
+aws_region  = "ap-south-1"
+aws_profile = "sarowar-ostad"
 
 # ============================================================================
 # Networking Configuration
 # ============================================================================
-vpc_id             = "vpc-xxxxxxxxxxxxxxxxx"
-public_subnet_ids  = ["subnet-xxxxxxxxxxxxxxxxx", "subnet-yyyyyyyyyyyyyyyyy"]
-private_subnet_ids = ["subnet-zzzzzzzzzzzzzzzzz", "subnet-aaaaaaaaaaaaaaaaa"]
+vpc_id             = "vpc-09b8ff7df1ed563aa"
+public_subnet_ids  = ["subnet-0033fdeaaf7d5d62b", "subnet-0c458c832f7fd23e5"]
+private_subnet_ids = ["subnet-064cc3f2966b58c87", "subnet-08ee468b2942ccbb9"]
 
 # Security Groups
-alb_security_group_id      = "sg-xxxxxxxxxxxxxxxxx"  # Allow 80, 443 from 0.0.0.0/0
-frontend_security_group_id = "sg-yyyyyyyyyyyyyyyyy"  # Allow 80 from ALB SG
-backend_security_group_id  = "sg-zzzzzzzzzzzzzzzzz"  # Allow 3000 from Frontend SG
-database_security_group_id = "sg-aaaaaaaaaaaaaaaaa"  # Allow 5432 from Backend SG
+alb_security_group_id      = "sg-0daffc7ad19169f0c" # Allow 80, 443 from 0.0.0.0/0
+frontend_security_group_id = "sg-0baf2c8ae2788cf64" # Allow 80 from ALB SG
+backend_security_group_id  = "sg-0786766f8ba9a9124" # Allow 3000 from Frontend SG
+database_security_group_id = "sg-05d22d92c38588f41" # Allow 5432 from Backend SG
 
 # ============================================================================
 # Route53 Configuration
 # ============================================================================
-hosted_zone_id = "Z1234567890ABC"
-domain_name    = "bmi.example.com"
+hosted_zone_id = "Z1019653XLWIJ02C53P5" # Get your actual hosted zone ID from Route53
+domain_name    = "bmiostad.ostaddevops.click"
 
 # ============================================================================
 # EC2 Configuration
 # ============================================================================
-key_name = "your-ec2-key-pair-name"
+key_name = "sarowar-ostad-mumbai"
 
 # Instance Types (adjust based on workload)
-instance_type_frontend = "t3.small"   # 2 vCPU, 2 GB RAM
-instance_type_backend  = "t3.small"   # 2 vCPU, 2 GB RAM
-instance_type_database = "t3.medium"  # 2 vCPU, 4 GB RAM
+instance_type_frontend = "t3.medium" # 2 vCPU, 2 GB RAM
+instance_type_backend  = "t3.medium" # 2 vCPU, 2 GB RAM
+instance_type_database = "t3.medium" # 2 vCPU, 4 GB RAM
 
 # Optional: Specify AMI ID (leave empty to use latest Ubuntu 22.04 LTS)
 # ami_id = "ami-0c55b159cbfafe1f0"
@@ -39,15 +39,15 @@ instance_type_database = "t3.medium"  # 2 vCPU, 4 GB RAM
 # ============================================================================
 # Application Configuration
 # ============================================================================
-git_repo_url = "https://github.com/your-username/bmi-health-tracker.git"
+git_repo_url = "https://github.com/sarowar-alam/terraform-3-tier-different-servers.git"
 git_branch   = "main"
 
 # ============================================================================
 # Database Configuration
 # ============================================================================
-db_name     = "bmidb"
+db_name     = "bmi_health_tracker"
 db_user     = "bmi_user"
-db_password = "your-secure-database-password-here"  # CHANGE THIS!
+db_password = "0stad2025" # CHANGE THIS!
 db_port     = 5432
 
 # ============================================================================
@@ -62,8 +62,8 @@ project_name = "bmi-health-tracker"
 environment  = "production"
 
 common_tags = {
-  Owner       = "Your Name"
-  Team        = "DevOps"
-  CostCenter  = "Engineering"
-  Terraform   = "true"
+  Owner      = "Sarowar Ostad"
+  Team       = "DevOps"
+  CostCenter = "Engineering"
+  Terraform  = "true"
 }
