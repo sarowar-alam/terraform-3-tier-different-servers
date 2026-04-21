@@ -349,15 +349,17 @@ For issues or questions:
 
 **Last Updated**: January 15, 2026
 
-**Terraform Version**: >= 1.0
-
-**AWS Provider**: ~> 5.0
-
 ---
 
-*MD Sarowar Alam*  
+## Author
+
+**MD Sarowar Alam**
 Lead DevOps Engineer, WPP Production
-📧 Email: sarowar@hotmail.com  
+📧 Email: [sarowar@hotmail.com](mailto:sarowar@hotmail.com)
 🔗 LinkedIn: https://www.linkedin.com/in/sarowar/
 
 ---
+
+**Terraform Version**: >= 1.0
+
+**AWS Provider**: ~> 5.0

@@ -682,11 +682,11 @@ This project is provided as-is for educational and portfolio purposes.
 
 ---
 
----
+## Author
 
-*MD Sarowar Alam*  
+**MD Sarowar Alam**
 Lead DevOps Engineer, WPP Production
-📧 Email: sarowar@hotmail.com  
+📧 Email: [sarowar@hotmail.com](mailto:sarowar@hotmail.com)
 🔗 LinkedIn: https://www.linkedin.com/in/sarowar/
 
 ---

@@ -2371,9 +2371,11 @@ To remove all resources and avoid charges:
 
 ---
 
-*MD Sarowar Alam*  
+## Author
+
+**MD Sarowar Alam**
 Lead DevOps Engineer, WPP Production
-📧 Email: sarowar@hotmail.com  
+📧 Email: [sarowar@hotmail.com](mailto:sarowar@hotmail.com)
 🔗 LinkedIn: https://www.linkedin.com/in/sarowar/
 
 ---
